@@ -1,3 +1,5 @@
+use chrono::{Local, Duration, Date};
+
 // Could replace with string
 #[derive(Debug, PartialEq, Clone)]
 pub enum PoolType {
@@ -9,7 +11,7 @@ pub enum PoolType {
 #[derive(Debug, PartialEq, Clone)]
 pub struct Practice {
     name: String,
-    date: chrono::Date<Tz>,
+    date: Date<Local>,
     pool_type: PoolType,
     sets: Vec<Set>,
 }
@@ -23,7 +25,7 @@ pub struct SetData {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum Set {
-    Multiline { subsets: Vec<Set>, data: EntryData },
-    Single { data: EntryData, time: chrono::Duration },
+    Multiline { subsets: Vec<Set>, data: SetData },
+    Single { data: SetData, time: Duration },
     Text(String),
 }
