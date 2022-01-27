@@ -14,6 +14,7 @@ pub struct Practice {
     date: Date<Local>,
     pool_type: PoolType,
     sets: Vec<Set>,
+    time: Option<Duration>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -26,6 +27,6 @@ pub struct SetData {
 #[derive(Debug, PartialEq, Clone)]
 pub enum Set {
     Multiline { subsets: Vec<Set>, data: SetData },
-    Single { data: SetData, time: Duration },
+    Single { data: SetData },
     Text(String),
 }
