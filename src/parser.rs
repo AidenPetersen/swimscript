@@ -1,32 +1,58 @@
-use chrono::{Local, Duration, Date};
+use nom::branch::alt;
+use nom::bytes::complete::{is_not};
+use nom::character::complete::{char, multispace0, space0, u32};
+use nom::combinator::{map};
+use nom::IResult;
+use nom::multi::{many0};
+use nom::sequence::preceded;
+use nom::sequence::terminated;
 
-// Could replace with string
 #[derive(Debug, PartialEq, Clone)]
-pub enum PoolType {
-    SCY,
-    SCM,
-    LCM,
+pub enum SetComponent {
+    Subset(Box<SetComponent>),
+    Label(String),
+    Reps(u32),
+    Distance(u32),
+    Attributes(Vec<String>),
 }
 
-#[derive(Debug, PartialEq, Clone)]
-pub struct Practice {
-    name: String,
-    date: Date<Local>,
-    pool_type: PoolType,
-    sets: Vec<Set>,
-    time: Option<Duration>,
+pub fn parse_label(i: &str) -> IResult<&str, SetComponent> {
+    map(
+        preceded(multispace0,
+                 terminated(
+                     is_not(":\n\r"),
+                     char(':'),
+                 )), |s: &str| SetComponent::Label(s.trim().to_string()))(i)
 }
 
-#[derive(Debug, PartialEq, Clone)]
-pub struct SetData {
-    label: Option<String>,
-    reps: u32,
-    attrs: Vec<String>,
+
+pub fn parse_reps(i: &str) -> IResult<&str, SetComponent> {
+    map(
+        preceded(space0,
+                 terminated(
+                     u32,
+                     preceded(space0, char('*')),
+                 )), |n| SetComponent::Reps(n),
+    )(i)
 }
 
-#[derive(Debug, PartialEq, Clone)]
-pub enum Set {
-    Multiline { subsets: Vec<Set>, data: SetData },
-    Single { data: SetData },
-    Text(String),
+pub fn parse_distance(i: &str) -> IResult<&str, SetComponent> {
+    map(
+        preceded(space0,
+                 terminated(
+                     u32, space0,
+                 ),
+        ), |n| SetComponent::Distance(n),
+    )(i)
+}
+
+
+pub fn parser(i: &str) -> IResult<&str, Vec<SetComponent>> {
+    many0(
+        alt((
+            parse_label,
+            parse_reps,
+            parse_distance,
+        ))
+    )(i)
 }
