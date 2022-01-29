@@ -11,7 +11,7 @@ fn get_data(file: &str) -> String{
 
 fn main() {
     let data = get_data("test.swim");
-    let result = parser::parser(&data).finish();
+    let result = parser::parser(&data);
     
     println!("{:#?}", result);
 }
