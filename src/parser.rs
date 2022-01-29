@@ -1,12 +1,12 @@
-use nom::branch::{alt, permutation};
-use nom::bytes::complete::{is_not, tag};
-use nom::character::complete::{alphanumeric0, char, line_ending, multispace0, newline, not_line_ending, space0, u32};
-use nom::combinator::{map, cut, eof, opt};
+use nom::{IResult};
+use nom::branch::{alt};
+use nom::bytes::complete::{is_not};
+use nom::character::complete::{char, multispace0, newline, space0, u32};
+use nom::combinator::{map, opt};
 use nom::error::{context, VerboseError};
-use nom::multi::{many0, many1, separated_list0, separated_list1};
+use nom::multi::{many0, separated_list1};
 use nom::sequence::{preceded, tuple};
 use nom::sequence::terminated;
-use nom::{IResult, Parser};
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum SetComponent {
@@ -26,7 +26,7 @@ pub struct SetData {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum Set {
-    Multiline { subsets: Vec<Set>, data: SetData },
+    Subset { subsets: Vec<Set>, data: SetData },
     Single { distance: u32, data: SetData },
     Text(String),
 }
@@ -78,17 +78,6 @@ fn parse_attributes(i: &str) -> IResult<&str, SetComponent, VerboseError<&str>> 
     )(i)
 }
 
-
-// fn parse_section(i: &str) -> IResult<&str, Set> {
-//     let (i, e) = preceded(
-//         multispace0,
-//         terminated(many0(alt((parse_label, parse_reps, parse_distance, parse_attributes))), newline))(i)?;
-//     let set = components_to_set(e);
-//     Ok((
-//         i,
-//         set
-//     ))
-// }
 fn parse_section(i: &str) -> IResult<&str, Set, VerboseError<&str>> {
     let (i, e) = context("section", preceded(multispace0, terminated(tuple((
         opt(parse_label),
@@ -98,7 +87,7 @@ fn parse_section(i: &str) -> IResult<&str, Set, VerboseError<&str>> {
     )), newline),
     ))(i)?;
 
-    let mut data = SetData {
+    let data = SetData {
         label: match e.0 {
             None => None,
             Some(SetComponent::Label(l)) => Some(l),
@@ -119,16 +108,17 @@ fn parse_section(i: &str) -> IResult<&str, Set, VerboseError<&str>> {
 
     match e.2 {
         SetComponent::Subset(subsets) => {
-            return Ok((
+            Ok((
                 i,
-                Set::Multiline { subsets, data }
-            ));
+                Set::Subset { subsets, data }
+            ))
         }
+
         SetComponent::Distance(distance) => {
-            return Ok((
+            Ok((
                 i,
                 Set::Single { distance, data }
-            ));
+            ))
         }
         _ => unreachable!()
     }
@@ -136,13 +126,13 @@ fn parse_section(i: &str) -> IResult<&str, Set, VerboseError<&str>> {
 
 fn parse_text(i: &str) -> IResult<&str, Set, VerboseError<&str>> {
     map(
-        context("text", terminated(
+        context("text", preceded(multispace0, terminated(
             preceded(
                 space0,
                 preceded(
                     char('-'),
                     preceded(space0, is_not("\n\r"),
-                    ))), multispace0)),
+                    ))), multispace0))),
         |s: &str| Set::Text(s.to_string()))(i)
 }
 
