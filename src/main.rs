@@ -35,6 +35,8 @@ fn write_output(data: String, args: Args) -> io::Result<()> {
 
 }
 
+const FORMATS: (&str, &str) = ("json", "ron");
+
 fn get_input(args: &Args) -> String {
     let file = args
         .input_file
@@ -68,8 +70,11 @@ fn main() {
 
     let parsed = parser::parser(data.as_str());
     if parsed.is_err() {
-        println!("Error: Could not parse file");
-        println!("{:#?}", parsed.as_ref().err())
+        let mut app = Args::into_app();
+        app.error(
+            ErrorKind::ValueValidation,
+            format!("Compilation error:\n{:#?}", parsed.as_ref().err().unwrap()),
+        ).exit()
     } else if args.verbose {
         println!("Parsed result: ");
         println!("{:#?}", parsed.as_ref().unwrap());
@@ -86,10 +91,13 @@ fn main() {
             let _ = write_output(ron, args);
 
         }
-        _ => {
-            println!("Error: Not a valid format.");
-            println!("Currently supported formats are:");
-            println!("json, ron");
+        str => {
+            let mut app = Args::into_app();
+            app.error(
+                ErrorKind::ValueValidation,
+                format!("{} is not a valid format type, currently\n{:?}\nare supported",
+                str, FORMATS),
+            ).exit()
         }
     }
 }
