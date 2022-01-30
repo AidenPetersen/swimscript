@@ -7,8 +7,9 @@ use nom::error::{context, VerboseError};
 use nom::multi::{many0, separated_list1};
 use nom::sequence::{preceded, tuple};
 use nom::sequence::terminated;
+use serde::{Serialize, Deserialize};
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Serialize)]
 pub enum SetComponent {
     Label(String),
     Reps(u32),
@@ -17,14 +18,14 @@ pub enum SetComponent {
     Subset(Vec<Set>),
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Serialize)]
 pub struct SetData {
     label: Option<String>,
     reps: u32,
     attributes: Vec<String>,
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Serialize)]
 pub enum Set {
     Subset { subsets: Vec<Set>, data: SetData },
     Single { distance: u32, data: SetData },

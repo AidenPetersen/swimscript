@@ -1,5 +1,4 @@
 use std::fs;
-
 mod parser;
 
 fn get_data(file: &str) -> String{
@@ -10,7 +9,9 @@ fn get_data(file: &str) -> String{
 
 fn main() {
     let data = get_data("test.swim");
-    let result = parser::parser(&data);
-    
+    let result = parser::parser(&data).unwrap().1;
+
+    let json = serde_json::to_string(&result);
+    fs::write("test.json", json.unwrap());
     println!("{:#?}", result);
 }
