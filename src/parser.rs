@@ -1,6 +1,6 @@
-use nom::{IResult};
-use nom::branch::{alt};
-use nom::bytes::complete::{is_not};
+use nom::IResult;
+use nom::branch::alt;
+use nom::bytes::complete::is_not;
 use nom::character::complete::{char, multispace0, newline, space0, u32};
 use nom::combinator::{map, opt};
 use nom::error::{context, VerboseError};
@@ -34,7 +34,8 @@ pub enum Set {
 fn parse_label(i: &str) -> IResult<&str, SetComponent, VerboseError<&str>> {
     map(
         context(
-            "label", terminated(terminated(is_not(":\n"), char(':')), space0),
+            "label",
+            terminated(is_not(":\n0123456789"), char(':')),
         ),
         |s: &str| SetComponent::Label(s.to_string()),
     )(i)
@@ -63,7 +64,11 @@ fn parse_distance(i: &str) -> IResult<&str, SetComponent, VerboseError<&str>> {
 fn parse_subset(i: &str) -> IResult<&str, SetComponent, VerboseError<&str>> {
     map(
         context("subset",
-                preceded(multispace0, preceded(char('{'), terminated(parser, char('}'))))),
+                preceded(
+                    multispace0, preceded(
+                        char('{'), terminated(
+                            parser, char('}'),
+                        )))),
         |x| SetComponent::Subset(x))(i)
 }
 
@@ -74,18 +79,18 @@ fn parse_attributes(i: &str) -> IResult<&str, SetComponent, VerboseError<&str>> 
                     space0, separated_list1(
                         char(','), preceded(space0, is_not(",\n\r")))),
         ),
-        |x: Vec<&str>| SetComponent::Attributes(x.iter().map(|y| y.to_string()).collect()),
+        |x: Vec<&str>| SetComponent::Attributes(x.iter().map(|y| y.trim().to_string()).collect()),
     )(i)
 }
 
 fn parse_section(i: &str) -> IResult<&str, Set, VerboseError<&str>> {
-    let (i, e) = context("section", preceded(multispace0, terminated(tuple((
+    let (i, e) = context("section", terminated(preceded(multispace0, tuple((
         opt(parse_label),
         opt(parse_reps),
         alt((parse_distance, parse_subset)),
         opt(parse_attributes),
-    )), newline),
-    ))(i)?;
+    ))), multispace0),
+    )(i)?;
 
     let data = SetData {
         label: match e.0 {
