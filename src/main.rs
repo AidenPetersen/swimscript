@@ -32,7 +32,6 @@ fn write_output(data: String, args: Args) -> io::Result<()> {
             "OUTPUT_FILE is required",
         ).exit()
     }), data)
-
 }
 
 const FORMATS: (&str, &str) = ("json", "ron");
@@ -89,14 +88,13 @@ fn main() {
         "ron" => {
             let ron = ron::to_string(&result).unwrap();
             let _ = write_output(ron, args);
-
         }
         str => {
             let mut app = Args::into_app();
             app.error(
                 ErrorKind::ValueValidation,
                 format!("{} is not a valid format type, currently\n{:?}\nare supported",
-                str, FORMATS),
+                        str, FORMATS),
             ).exit()
         }
     }
