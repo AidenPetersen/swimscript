@@ -1,0 +1,13 @@
+[package]
+authors = ["Aiden Petersen <AidenPetersen@protonmail.com>"]
+name = "parser"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+nom = "7.1.0"
+chrono = "0.4.19"
+ron = "0.7.0"
+serde = { version = "1.0.136", features = ["derive"] }
+serde_json = "1.0.78"
+

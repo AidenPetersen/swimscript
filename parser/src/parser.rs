@@ -68,7 +68,7 @@ fn parse_subset(i: &str) -> IResult<&str, SetComponent, VerboseError<&str>> {
                 preceded(
                     multispace0, preceded(
                         char('{'), terminated(
-                            parser, char('}'),
+                            root_parser, char('}'),
                         )))),
         |x| SetComponent::Subset(x))(i)
 }
@@ -142,6 +142,15 @@ fn parse_text(i: &str) -> IResult<&str, Set, VerboseError<&str>> {
         |s: &str| Set::Text(s.to_string()))(i)
 }
 
-pub fn parser(i: &str) -> IResult<&str, Vec<Set>, VerboseError<&str>> {
+fn root_parser(i: &str) -> IResult<&str, Vec<Set>, VerboseError<&str>> {
     many1(alt((parse_text, parse_section)))(i)
 }
+
+pub fn parse<'a>(mut i: String) -> IResult<&'a str, Vec<Set>, VerboseError<&'a str>> {
+    i.push('\n');
+    let result = root_parser(i.as_str());
+    i.pop();
+    result
+
+}
+
