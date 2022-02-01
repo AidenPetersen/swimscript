@@ -1,8 +1,6 @@
 use std::{fs, io};
 use clap::{ErrorKind, IntoApp, Parser};
-
-mod parser;
-
+use parser;
 
 #[derive(Parser)]
 #[clap(name = "swimscript")]
@@ -14,10 +12,6 @@ struct Args {
 
     /// Name of the output file
     output_file: Option<String>,
-
-    /// Verbose
-    #[clap(short, long)]
-    verbose: bool,
 
     /// Format to compile to
     #[clap(short, long, default_value = "json")]
@@ -49,7 +43,7 @@ fn get_input(args: &Args) -> String {
             ).exit()
         });
 
-    let mut data = fs::read_to_string(file).unwrap_or_else(|_| {
+    let data = fs::read_to_string(file).unwrap_or_else(|_| {
         let mut app = Args::into_app();
         // Error if it doesn't exist
         app.error(
@@ -57,36 +51,22 @@ fn get_input(args: &Args) -> String {
             "INPUT_FILE is not a valid file",
         ).exit()
     });
-    data.push('\n');
     data
 }
 
-fn main() {
+pub fn run() {
     // Setup CLI
     let args: Args = Args::parse();
 
     let data = get_input(&args);
 
-    let parsed = parser::parser(data.as_str());
-    if parsed.is_err() {
-        let mut app = Args::into_app();
-        app.error(
-            ErrorKind::ValueValidation,
-            format!("Compilation error:\n{:#?}", parsed.as_ref().err().unwrap()),
-        ).exit()
-    } else if args.verbose {
-        println!("Parsed result: ");
-        println!("{:#?}", parsed.as_ref().unwrap());
-    }
-    let result = parsed.unwrap().1;
-
     match args.format.to_lowercase().as_str() {
         "json" => {
-            let json = serde_json::to_string(&result).unwrap();
+            let json = parser::to_json(&data).unwrap();
             let _ = write_output(json, args);
         }
         "ron" => {
-            let ron = ron::to_string(&result).unwrap();
+            let ron = parser::to_ron(&data).unwrap();
             let _ = write_output(ron, args);
         }
         str => {
@@ -98,4 +78,8 @@ fn main() {
             ).exit()
         }
     }
+}
+
+fn main() {
+    run();
 }

@@ -1,0 +1,9 @@
+[package]
+authors = ["Aiden Petersen <AidenPetersen@protonmail.com>"]
+name = "cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "3.0.13", features = ["derive"] }
+parser = { package = "parser", path = "../parser" }

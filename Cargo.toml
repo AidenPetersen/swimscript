@@ -1,15 +1,5 @@
-[package]
-name = "swimscript"
-version = "0.1.0"
-edition = "2021"
-readme = "README.md"
-license = "MIT"
-
-[dependencies]
-nom = "7.1.0"
-clap = { version = "3.0.13", features = ["derive"] }
-chrono = "0.4.19"
-ron = "0.7.0"
-serde = { version = "1.0.136", features = ["derive"] }
-serde_json = "1.0.78"
-
+[workspace]
+members = [
+    "parser",
+    "cli"
+]
