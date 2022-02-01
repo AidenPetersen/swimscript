@@ -78,7 +78,7 @@ fn parse_attributes(i: &str) -> IResult<&str, SetComponent, VerboseError<&str>> 
         context("attributes",
                 preceded(
                     space0, separated_list1(
-                        char(','), preceded(space0, is_not(",\n\r")))),
+                        char(','), preceded(space0, is_not(",\n\r}")))),
         ),
         |x: Vec<&str>| SetComponent::Attributes(x.iter().map(|y| y.trim().to_string()).collect()),
     )(i)

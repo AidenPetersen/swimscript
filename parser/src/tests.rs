@@ -1,10 +1,6 @@
 use crate::to_json;
 
 const BASIC_JSON: &str = "[{\"Subset\":{\"subsets\":[{\"Single\":{\"distance\":125,\"data\":{\"label\":null,\"reps\":5,\"attributes\":[\"75 swim\",\"@1:45\",\"25 drill\",\"25 kick\"]}}},{\"Single\":{\"distance\":200,\"data\":{\"label\":null,\"reps\":1,\"attributes\":[\"IM\",\"Drill / Swim\"]}}},{\"Single\":{\"distance\":50,\"data\":{\"label\":null,\"reps\":4,\"attributes\":[\"Choice\",\"@:55\",\"Variable\"]}}}],\"data\":{\"label\":\"Warm Up\",\"reps\":1,\"attributes\":[]}}}]";
-#[test]
-fn it_works() {
-    assert_eq!(1, 1)
-}
 
 #[test]
 fn basic() {
