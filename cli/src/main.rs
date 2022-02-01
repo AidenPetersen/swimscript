@@ -43,7 +43,7 @@ fn get_input(args: &Args) -> String {
             ).exit()
         });
 
-    let mut data = fs::read_to_string(file).unwrap_or_else(|_| {
+    let data = fs::read_to_string(file).unwrap_or_else(|_| {
         let mut app = Args::into_app();
         // Error if it doesn't exist
         app.error(
@@ -54,20 +54,19 @@ fn get_input(args: &Args) -> String {
     data
 }
 
-fn main() {
+pub fn run() {
     // Setup CLI
     let args: Args = Args::parse();
 
     let data = get_input(&args);
 
-
     match args.format.to_lowercase().as_str() {
         "json" => {
-            let json = serde_json::to_string(&result).unwrap();
+            let json = parser::to_json(&data).unwrap();
             let _ = write_output(json, args);
         }
         "ron" => {
-            let ron = ron::to_string(&result).unwrap();
+            let ron = parser::to_ron(&data).unwrap();
             let _ = write_output(ron, args);
         }
         str => {
@@ -79,4 +78,8 @@ fn main() {
             ).exit()
         }
     }
+}
+
+fn main() {
+    run();
 }

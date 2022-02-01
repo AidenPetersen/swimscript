@@ -1,15 +1,5 @@
-[package]
-name = "swimscript"
-version = "0.1.0"
-edition = "2021"
-readme = "README.md"
-license = "MIT"
-
 [workspace]
 members = [
     "parser",
     "cli"
 ]
-
-[dependencies]
-
