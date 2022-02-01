@@ -1,13 +1,13 @@
-use nom::IResult;
 use nom::branch::alt;
 use nom::bytes::complete::is_not;
 use nom::character::complete::{char, multispace0, space0, u32};
 use nom::combinator::{map, opt};
 use nom::error::{context, VerboseError};
+use nom::IResult;
 use nom::multi::{many1, separated_list1};
 use nom::sequence::{preceded, tuple};
 use nom::sequence::terminated;
-use serde::{Serialize};
+use serde::Serialize;
 
 #[derive(Debug, PartialEq, Clone, Serialize)]
 pub enum SetComponent {

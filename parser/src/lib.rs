@@ -1,8 +1,7 @@
-pub mod parser;
 use nom::error::VerboseError;
 use nom::IResult;
 
-
+pub mod parser;
 #[cfg(test)]
 mod tests;
 

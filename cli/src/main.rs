@@ -1,5 +1,7 @@
 use std::{fs, io};
+
 use clap::{ErrorKind, IntoApp, Parser};
+
 use parser;
 
 #[derive(Parser)]
